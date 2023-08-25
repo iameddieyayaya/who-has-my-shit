@@ -1,0 +1,65 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = "native"
+}
+
+model User {
+  id           String         @id @unique @default(cuid())
+  externalId   String         @unique
+  email        String         @unique
+  name         String?
+  image        String?
+  phoneNumber  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  ownedGear    Gear[]
+  lentGear     GearLending[]
+  borrowedGear GearBorrowed[]
+}
+
+model Gear {
+  id             String        @id @unique @default(cuid())
+  name           String
+  description    String?
+  image          String?
+  owner          User          @relation(fields: [userId], references: [id])
+  userId         String
+  gearLending    GearLending?  @relation(fields: [gearLendingId], references: [id])
+  gearLendingId  String?
+  gearBorrowed   GearBorrowed? @relation(fields: [gearBorrowedId], references: [id])
+  gearBorrowedId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model GearLending {
+  id       String  @id @unique @default(cuid())
+  lendee   User?   @relation(fields: [userId], references: [id])
+  lentGear Gear[]
+  userId   String?
+
+  lendDate   DateTime?
+  returnDate DateTime?
+  returned   Boolean?  @default(false)
+
+  createdAt DateTime @default(now())
+}
+
+model GearBorrowed {
+  id           String @id @unique @default(cuid())
+  borrower     User   @relation(fields: [userId], references: [id])
+  borrowedGear Gear[]
+  userId       String
+
+  borrowDate DateTime?
+  returnDate DateTime?
+  returned   Boolean?  @default(false)
+
+  createdAt DateTime @default(now())
+}
