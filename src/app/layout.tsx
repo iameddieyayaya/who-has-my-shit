@@ -18,7 +18,6 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={inter.className}>
-          <div>Hello</div>
           {children}
         </body>
       </html>
